@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: FinalCase
+Bundle-Name: Calculator
 Bundle-SymbolicName: Calculator
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: finalcase.Activator
+Bundle-Activator: Calculator.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: FinalCase
 Import-Package: NumberConventerService,
