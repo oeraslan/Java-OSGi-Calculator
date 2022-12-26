@@ -70,6 +70,8 @@ public class CalculatorUI extends JFrame {
 		        int number1 = numberConverter.convertToNumber(num1, currentLocale);
 		        int number2 = numberConverter.convertToNumber(num2, currentLocale);
 		        System.out.println("----mult-----");
+		        System.out.println(number1);
+		        System.out.println(number2);
 		        System.out.println(number1*number2);
 		        System.out.println("-----------");
 		        String result  =   numberConverter.convertToString(number1*number2,currentLocale);

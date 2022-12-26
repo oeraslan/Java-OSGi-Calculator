@@ -66,8 +66,7 @@ public class NumberConverterServiceImpl implements NumberConverterService {
 
 	}
 
-	
-	public  String getKey(Map<String, Integer> numbers, int number) {
+	public String getKey(Map<String, Integer> numbers, int number) {
 		for (String word : numbers.keySet()) {
 			if (numbers.get(word).equals(number)) {
 				return word;
@@ -76,32 +75,66 @@ public class NumberConverterServiceImpl implements NumberConverterService {
 		return "Does not have a such number";
 	}
 
-	public  int convertToNumber(String input, Locale locale) {
+	public int convertToNumber(String input, Locale locale) {
 		Locale en = new Locale("en", "EN");
 		input = input.toLowerCase();
 		Map<String, Integer> numberMap = turkishNumbers;
 		if (locale.equals(en)) {
 			numberMap = englishNumbers;
 		}
-		int result = 1;
-		int current = 0;
+		String[] words = input.split(" ");
+		int current = 1;
 		int last = 0;
-		for (String s : input.split(" ")) {
-			current = numberMap.getOrDefault(s, 0);
-			if (current == 0) {
+		int result = 0;
+		for (int i = 0; i < words.length; i++) {
+			String word = words[i];
+			if (numberMap.containsKey(word)) {
+				int value = numberMap.get(word);
+				if (value >= 1000) {
+					current *= value;
+					if (current < last) {
+						last += current;
+					} else {
+						last = current;
+					}
+
+				} else if (value >= 100) {
+					if (i < words.length - 1 && numberMap.containsKey(words[i + 1])
+							&& numberMap.get(words[i + 1]) < 100) {
+						current = value + numberMap.get(words[i + 1]);
+						last += current;
+						i++;
+					} else {
+						current = value;
+						last += current;
+					}
+				} else if (value >= 10 && i < words.length - 1 && numberMap.get(words[i + 1]) < 10) {
+					if (i < words.length - 1 && numberMap.containsKey(words[i + 1])) {
+						current = value + numberMap.get(words[i + 1]);
+						last += current;
+						i++;
+					} else {
+						current = value;
+						last += current;
+					}
+				} else {
+					if (i < words.length - 1 && numberMap.containsKey(words[i + 1])) {
+						current = value * numberMap.get(words[i + 1]);
+						last += current;
+						i++;
+					} else {
+						current = value;
+						last += current;
+					}
+				}
+			} else {
 				return 0;
 			}
-			if (current > last) {
-				result *= current;
-			} else {
-				result += current;
-			}
-			last = current;
 		}
-		return result;
+		return last;
 	}
 
-	public  String convertToString(int number, Locale locale) {
+	public String convertToString(int number, Locale locale) {
 		Locale en = new Locale("en", "EN");
 		Map<String, Integer> numberMap = turkishNumbers;
 		if (locale.equals(en)) {
@@ -130,14 +163,16 @@ public class NumberConverterServiceImpl implements NumberConverterService {
 		} else if (temp > 10) {
 			word += convertLessThan100(temp, locale) + " " + getKey(numberMap, 1000) + " "
 					+ convertLessThan1000(remain, locale);
-		} else if (temp > 0) {
+		} else if (temp > 1) {
 			word += convertToString(temp, locale) + " " + getKey(numberMap, 1000) + " "
 					+ convertLessThan1000(remain, locale);
+		} else {
+			word += getKey(numberMap, 1000) + " " + convertLessThan1000(remain, locale);
 		}
 		return word;
 	}
 
-	public  String convertLessThan1000(int number, Locale locale) {
+	public String convertLessThan1000(int number, Locale locale) {
 		Locale en = new Locale("en", "EN");
 		Map<String, Integer> numberMap = turkishNumbers;
 
@@ -158,15 +193,17 @@ public class NumberConverterServiceImpl implements NumberConverterService {
 			if (remain > 0) {
 				word += " ";
 			}
-		} else {
+		} else if (temp < 1 && remain > 99) {
 			word += getKey(numberMap, 100);
+		} else if (temp == 1) {
+			word += getKey(numberMap, 100) + " ";
 		}
 		word += convertLessThan100(remain, locale);
 
 		return word;
 	}
 
-	public  String convertLessThan100(int number, Locale locale) {
+	public String convertLessThan100(int number, Locale locale) {
 		Locale en = new Locale("en", "EN");
 		Map<String, Integer> numberMap = turkishNumbers;
 
